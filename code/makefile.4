@@ -10,12 +10,7 @@ main.o : main.c
 
 
 
-.PHONY : rebuild clean all
-
-rebuild : clean all
-
-all : hello.out
-
-clean :
+clean : FORCE
 	rm *.o hello.out
+FORCE :	
 	
