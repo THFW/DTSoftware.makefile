@@ -1,20 +1,21 @@
 
-hm := hello makefile
+var := D.T.Software
+new := TDelphi
 
-override var := override-test
+test : var := test-var
+%e : override new := test-new
 
-define foo
-I'm fool!
-endef
-
-override define cmd
-	@echo "run cmd ls ..."
-	@ls
-endef
-
-test :
-	@echo "hm => $(hm)"
+test : another
+	@echo "test :"
 	@echo "var => $(var)"
-	@echo "foo => $(foo)"
-	${cmd}
+	@echo "new => $(new)"
 	
+another :
+	@echo "another :"
+	@echo "var => $(var)"
+	@echo "new => $(new)"
+	
+rule :
+	@echo "rule :"
+	@echo "var => $(var)"
+	@echo "new => $(new)"
