@@ -1,17 +1,14 @@
-SRCS := $(wildcard *.c)
-OBJS := $(SRCS:.c=.o)
 
-CC := gcc
+app.out : main func.o
 
-all :
-	@echo "$(.VARIABLES)"
+	 $(CC) -lstdc++ -o $@ $^
 
-app.out : $(OBJS)
-	$(CC) -o $@ $^
-	$(RM) $^
-	@echo "Target ==> $@"
 
-%.o : %.c
-	@echo "my rule"
-	$(CC) -c -o $@ $^
+.c.o :
+	@echo "my suffix rule"
+	$(CC) -o $@ -c $^
+	
+.c :
+	@echo "my suffix rule"
+	$(CC) -o $@ -c $^
 	

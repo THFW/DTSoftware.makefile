@@ -1,10 +1,10 @@
 #include <stdio.h>
 
-extern void foo();
+extern void greeting();
 
 int main()
 {
-    foo();
+	greeting();
 	
-    return 0;
+	return 0;
 }	

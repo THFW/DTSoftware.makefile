@@ -1,11 +1,7 @@
 
-.PHONY : all 
+
+app.out : main.o func.o
+	 $(CC) -lstdc++ -o $@ $^
+	 
 
 
-VAR := test
-
-all : 
-	@echo "all : $(VAR)"
-
-
-include 1.mk
