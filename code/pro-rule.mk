@@ -1,5 +1,5 @@
 
-.PHONY : all compile link clean rebuild
+.PHONY : all compile link clean rebuild $(MODULES)
 
 DIR_PROJECT := $(realpath .)
 DIR_BUILD_SUB := $(addprefix $(DIR_BUILD)/, $(MODULES))
@@ -9,6 +9,18 @@ MODULE_LIB := $(addprefix $(DIR_BUILD)/, $(MODULE_LIB))
 
 APP := $(addprefix $(DIR_BUILD)/, $(APP))
 
+define makemodule
+	cd $(1) && \
+	$(MAKE) all \
+			DEBUG:=$(DEBUG) \
+			DIR_BUILD:=$(addprefix $(DIR_PROJECT)/, $(DIR_BUILD)) \
+			DIR_COMMON_INC:=$(addprefix $(DIR_PROJECT)/, $(DIR_COMMON_INC)) \
+			CMD_CFG:=$(addprefix $(DIR_PROJECT)/, $(CMD_CFG)) \
+			MOD_CFG:=$(addprefix $(DIR_PROJECT)/, $(MOD_CFG)) \
+			MOD_RULE:=$(addprefix $(DIR_PROJECT)/, $(MOD_RULE)) && \
+	cd .. ; 
+endef
+
 all : compile $(APP)
 	@echo "Success! Target ==> $(APP)"
 
@@ -17,15 +29,7 @@ compile : $(DIR_BUILD) $(DIR_BUILD_SUB)
 	@set -e; \
 	for dir in $(MODULES); \
 	do \
-		cd $$dir && \
-		$(MAKE) all \
-		        DEBUG:=$(DEBUG) \
-		        DIR_BUILD:=$(addprefix $(DIR_PROJECT)/, $(DIR_BUILD)) \
-		        DIR_COMMON_INC:=$(addprefix $(DIR_PROJECT)/, $(DIR_COMMON_INC)) \
-		        CMD_CFG:=$(addprefix $(DIR_PROJECT)/, $(CMD_CFG)) \
-		        MOD_CFG:=$(addprefix $(DIR_PROJECT)/, $(MOD_CFG)) \
-		        MOD_RULE:=$(addprefix $(DIR_PROJECT)/, $(MOD_RULE)) && \
-		cd .. ; \
+		$(call makemodule, $$dir) \
 	done
 	@echo "Compile Success!"
 	
@@ -43,3 +47,9 @@ clean :
 	@echo "Clean Success!"
 	
 rebuild : clean all
+
+$(MODULES) : $(DIR_BUILD) $(DIR_BUILD)/$(MAKECMDGOALS)
+	@echo "Begin to compile $@"
+	@set -e; \
+	$(call makemodule, $@)
+	
