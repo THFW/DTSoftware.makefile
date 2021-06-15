@@ -1,9 +1,10 @@
 
-.PHONY : test a b c
+.PHONY : all
 
-test : a b
-
-test : b c
-
-test : 
-	@echo "$^"
+all :
+	set -e; \
+	mkdir test; \
+	cd test; \
+	mkdir subtest
+	
+	
