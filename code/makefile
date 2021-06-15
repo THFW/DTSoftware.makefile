@@ -1,47 +1,57 @@
-.PHONY : all clean
 
+.PHONY : all
 
-DIR_BUILD := build
+DIR_BUILD := /home/delphi/make/build
+DIR_COMMON_INC := /home/delphi/make/common/inc
+
 DIR_SRC := src
 DIR_INC := inc
 
 TYPE_INC := .h
 TYPE_SRC := .c
 TYPE_OBJ := .o
+TYPE_DEP := .dep
+
+AR := ar
+ARFLAGS := crs
 
 CC := gcc
-LFLAGS :=
-CFLAGS := -I $(DIR_INC)
+CFLAGS := -I$(DIR_INC) -I$(DIR_COMMON_INC)
+
 ifeq ($(DEBUG),true)
 CFLAGS += -g
 endif
 
-MKDIR := mkdir
-RM := rm -fr
+MODULE := $(realpath .)
+MODULE := $(notdir $(MODULE))
+DIR_OUTPUT := $(addprefix $(DIR_BUILD)/, $(MODULE))
 
-APP := $(DIR_BUILD)/app.out
-HDRS := $(wildcard $(DIR_INC)/*$(TYPE_INC))
-HDRS := $(notdir $(HDRS))
-OBJS := $(wildcard $(DIR_SRC)/*$(TYPE_SRC))
-OBJS := $(OBJS:$(TYPE_SRC)=$(TYPE_OBJ))
-OBJS := $(patsubst $(DIR_SRC)/%, $(DIR_BUILD)/%, $(OBJS))
+OUTPUT := $(MODULE).a
+OUTPUT := $(addprefix $(DIR_BUILD)/, $(OUTPUT))
+
+SRCS := $(wildcard $(DIR_SRC)/*$(TYPE_SRC))
+OBJS := $(SRCS:$(TYPE_SRC)=$(TYPE_OBJ))
+OBJS := $(patsubst $(DIR_SRC)/%, $(DIR_OUTPUT)/%, $(OBJS))
+DEPS := $(SRCS:$(TYPE_SRC)=$(TYPE_DEP))
+DEPS := $(patsubst $(DIR_SRC)/%, $(DIR_OUTPUT)/%, $(DEPS))
 
 vpath %$(TYPE_INC) $(DIR_INC)
+vpath %$(TYPE_INC) $(DIR_COMMON_INC)
 vpath %$(TYPE_SRC) $(DIR_SRC)
 
-all : $(DIR_BUILD) $(APP)
-	@echo "Target File ==> $(APP)"
+-include $(DEPS)
+
+all : $(OUTPUT)
+	@echo "Success! Target ==> $(OUTPUT)"
 	
-$(DIR_BUILD) :
-	$(MKDIR) $@
+$(OUTPUT) : $(OBJS)
+	$(AR) $(ARFLAGS) $@ $^
 	
-$(APP) : $(OBJS)
-	$(CC) $(LFLAGS) -o $@ $^
-	
-$(DIR_BUILD)/%$(TYPE_OBJ) : %$(TYPE_SRC) $(HDRS)
-	$(CC) $(CFLAGS) -o $@ -c $<
-	
-clean :
-	$(RM) $(DIR_BUILD)
+$(DIR_OUTPUT)/%$(TYPE_OBJ) : %$(TYPE_SRC)
+	$(CC) $(CFLAGS) -o $@ -c $(filter %$(TYPE_SRC), $^)
 	
 	
+$(DIR_OUTPUT)/%$(TYPE_DEP) : %$(TYPE_SRC)
+	@echo "Creating $@ ..."
+	@set -e; \
+	$(CC) $(CFLAGS) -MM -E $(filter %$(TYPE_SRC), $^) | sed 's,\(.*\)\.o[ :]*,$(DIR_OUTPUT)/\1$(TYPE_OBJ) $@ : ,g' > $@
