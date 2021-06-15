@@ -1,22 +1,20 @@
 
-.PHONY : all out first second third test
+hm := hello makefile
 
-all out : 
-	@echo "$(MAKE)"
-	@echo "$(MAKECMDGOALS)"
-	@echo "$(MAKEFILE_LIST)"
-	
-	
-first :
-	@echo "first"
-	
-second :
-	@echo "second"
-	
-third :
-	@echo "third"
-	
+override var := override-test
+
+define foo
+I'm fool!
+endef
+
+override define cmd
+	@echo "run cmd ls ..."
+	@ls
+endef
+
 test :
-	@$(MAKE) first
-	@$(MAKE) second
-	@$(MAKE) third
+	@echo "hm => $(hm)"
+	@echo "var => $(var)"
+	@echo "foo => $(foo)"
+	${cmd}
+	
