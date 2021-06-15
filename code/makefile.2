@@ -1,32 +1,24 @@
-# ex1
-# x := foo
-# y := $(x)b
-# x := new
 
-# ex2
-# x = foo
-# y = $(x)b
-# x = new
+CC := g++
+TARGET := hello-world.out
 
-# a = $(b)
-# b = $(c)
-# c = hello-makefile
+$(TARGET) : func.o main.o
+	$(CC) -o $@ $^
 
-# ex3
-# x := foo
-# y := $(x)b
-# x ?= new
+func.o : func.c
+	$(CC) -o $@ -c $^
 
-# ex4
-# x := foo
-# y := $(x)b
-# x += new
+main.o : main.c
+	$(CC) -o $@ -c $^
 
-.PHONY : test
+.PHONY : rebuild clean all
 
-test :
-	@echo "x => $(x)"
-	@echo "y => $(y)"
-	@echo "a => $(a)"
-	@echo "b => $(b)"
-	@echo "c => $(c)"
+rebuild : clean all
+
+
+all : $(TARGET)
+
+clean :
+	$(RM) *.o $(TARGET)
+
+	
